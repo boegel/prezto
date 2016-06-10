@@ -1,0 +1,41 @@
+#
+# boegel's themeA monochrome theme that displays basic information.
+#
+# Authors:
+#   Kenneth Hoste (kenneth.hoste@ugent.be)
+
+function prompt_boegel_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+}
+
+function prompt_boegel_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_boegel_precmd
+
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:branch' format '%F{100}%b%f'
+  zstyle ':prezto:module:git:info:modified' format '%F{red}●%f'
+  zstyle ':prezto:module:git:info:added' format '%F{green}●%f'
+
+  zstyle ':prezto:module:git:info:keys' format \
+  'prompt'  ' [%b%m%a]' \
+  'rprompt' '[%R]'
+
+  # Define prompts.
+  PROMPT='%2~ ${git_info:+${(e)git_info[prompt]}}$ '
+  RPROMPT=''
+}
+
+prompt_boegel_setup "$@"

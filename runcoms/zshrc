@@ -11,3 +11,81 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+export PATH=$HOME/.pypkgs/bin:$PATH
+export PYTHONPATH=$HOME/.pypkgs/lib/python2.7/site-packages:$PYTHONPATH
+
+export PATH=$HOME/work/easybuild-framework:$PATH
+export PYTHONPATH=$HOME/work/easybuild-easyconfigs:$HOME/work/easybuild-easyblocks:$HOME/work/easybuild-framework:$HOME/work/vsc-base/lib:$HOME/work/vsc-install/lib:$PYTHONPATH
+
+source $HOME/.lmod/lmod/lmod/init/zsh
+
+export EASYBUILD_GITHUB_USER=boegel
+export EASYBUILD_MODULES_TOOL=Lmod
+export EASYBUILD_GIT_WORKING_DIRS_PATH=$HOME/work
+export TEST_EASYBUILD_MODULES_TOOL=Lmod
+module use $HOME/.local/easybuild/modules/all
+
+# git shortcuts
+alias gs="git status"
+alias gd="git diff"
+alias gdc="git diff --cached"
+alias gds="git diff --stat"
+alias gc="git commit"
+alias ga="git add"
+alias gb="git branch"
+alias go="git checkout"
+#alias gp="git push github_boegel"
+alias gf="git fetch"
+alias gm="git merge"
+
+function det_git_branch(){
+    branch_name=`git status | head -1 | sed 's/^[# ]*On branch //g'`
+    echo $branch_name 
+}
+
+function gu(){
+    # 'update' current branch
+    git pull origin `det_git_branch`
+}
+
+function gp(){
+    branch_name="${@: -1}"
+    if [ -z $branch_name ]
+    then
+        branch_name=`det_git_branch`
+    fi
+    git push github_boegel $branch_name
+}
+ 
+function gdd(){
+    # delete branch, if up-to-date with develop
+    branch_name_gdd=`det_git_branch` && echo "Deleting branch $branch_name_gdd" && go develop && gu && gb -d $branch_name_gdd;
+}
+
+# login shortcuts
+alias g="ssh -A vsc40023@login.hpc.ugent.be"
+alias g3="ssh -A hpc3"
+
+alias juropa='ssh -i ~/Documents/new_id_rsa zdv660@juropa.fz-juelich.de'
+#alias juqueen='ssh -i ~/Documents/new_id_rsa zdv660@juqueen.fz-juelich.de'
+alias juqueen='ssh -i ~/Documents/new_id_rsa paj15090@juqueen.fz-juelich.de'
+
+function up () {
+        c=${1-1}
+        if [ -z "${c//[0-9]/}" -a "$c" -gt 0 ]
+        then
+                cd $(eval "printf '../'%.0s {1..$c}")
+                pwd
+        else
+                echo 'usage: up or up N # (N > 0)'
+        fi
+}
+function cd () {
+        if [ -n "$1" ]
+        then
+                [ -f "$1" ] && set -- "${1%/*}"
+        fi
+        builtin cd "$@"
+}
+
+alias grepi="grep -RIn"
